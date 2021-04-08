@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="(line, index) in mapData" :key="index">
-      <div class="one-line" v-for="tile in mapData[index]" :key="tile">
+      <div class="one-line" v-for="(tile, mIndex) in mapData[index]" :key="mIndex">
         <MapTile v-bind:type="tile"></MapTile>
       </div>
     </div>
@@ -17,7 +17,7 @@ export default {
     mapData: {
       type: Array,
       required: false,
-      default: [
+      default: () => [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 9, 2, 2, 2, 2, 2, 2, 1],
         [1, 1, 1, 1, 1, 1, 1, 2, 1],
