@@ -22,7 +22,7 @@ export default {
           x:0,
           y:0,
         },
-        rot: 0,
+        rot: 270,
       })
     },
     mapData: {
@@ -37,23 +37,41 @@ export default {
       ],
     },
   },
-  data: {
+  data: () => ({
     intervalTimerHandler: null,
-  },
+  }),
   methods: {
     run: function () {
       this.intervalTimerHandler = setInterval(() => {
-        this.robot.loc.y -= 1
+        var dv = this.calcDirection()
+        this.robot.loc.x += dv.x
+        this.robot.loc.y += dv.y
       }, 1000);
     },
     step: function () {
-      this.intervalTimerHandler = setInterval(() => {
-        this.robot.loc.y -= 1
-        clearInterval(this.intervalTimerHandler)
-      }, 0);
+      stop()
+      var dv = this.calcDirection()
+      this.robot.loc.x += dv.x
+      this.robot.loc.y += dv.y
     },
     stop: function () {
       clearInterval(this.intervalTimerHandler)
+    },
+    calcDirection: function () {
+      var dv = {
+        x: 0,
+        y: 0,
+      }
+      if (this.robot.rot < 90) {
+        dv.y -= 1
+      } else if (this.robot.rot < 180) {
+        dv.x += 1
+      } else if (this.robot.rot < 270) {
+        dv.y += 1
+      } else if (this.robot.rot < 360) {
+        dv.x -= 1
+      }
+      return dv
     }
   }
 }
