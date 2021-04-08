@@ -5,6 +5,7 @@
       <b-button v-on:click="run" variant="success">Run</b-button>
       <b-button v-on:click="step" variant="success">Step</b-button>
       <b-button v-on:click="stop" variant="danger">Stop</b-button>
+      <div>{{ steps }} steps</div>
       <div>{{ msg }}</div>
     </div>
   </div>
@@ -44,10 +45,13 @@ export default {
     },
   },
   data: () => ({
+    steps: 0,
     intervalTimerHandler: null,
     programChain: [],
     programCounter: 0,
     prevResult: 0,
+    skipNext: false,
+    vars: [],
   }),
   created: function () {
     this.program()
@@ -96,6 +100,12 @@ export default {
     actionRotate: function (degree) {
       this.actionAdd('rot', degree)
     },
+    actionMemory: function (varName) {
+      this.actionAdd('memory', varName)
+    },
+    actionCondition: function (...condition) {
+      this.actionAdd('condition', condition)
+    },
     processSensor: function () {
       var result = 0
 
@@ -139,7 +149,7 @@ export default {
       
       return result
     },
-    proocessGo: function () {
+    processGo: function () {
       var result = 0
       var dv = this.calcDirection()
       var nextX = this.robot.loc.x + dv.x
@@ -174,21 +184,53 @@ export default {
 
       return result
     },
+    processRotate: function (degree) {
+      var result = 0
+      this.robot.rot += degree
+      if (this.robot.rot <= 0 || this.robot.rot >= 360) {
+        this.robot.rot = 0
+      }
+      return result
+    },
+    processMemory: function (varName) {
+      var result = 0
+      this.vars[varName] = this.prevResult
+      return result
+    },
+    processCondition: function (...condition) {
+      if (condition.length == 1) {
+        if (this.prevResult != condition[0]) {
+          this.skipNext = true
+        }
+      } else if(this.vars[condition[1]] != condition[0]) {
+          this.skipNext = true
+      }
+    },
     processRun: function () {
+      this.steps++
       var action = this.programChain[this.programCounter++]
       if (this.programCounter >= this.programChain.length) {
         this.programCounter = 0
+      }
+      if (this.skipNext) {
+        this.skipNext = false
+        return
       }
       switch (action.action) {
         case 'sensor':
           this.prevResult = this.processSensor()
           break;
         case 'go':
-          this.prevResult = this.proocessGo()
+          this.prevResult = this.processGo()
           break;
         case 'rot':
-          this.robot.rot += action.params[0]
-          this.prevResult = 1
+          this.prevResult = this.processRotate(action.params[0])
+          break;
+        case 'memory':
+          this.prevResult = this.processMemory(action.params[0])
+          break;
+        case 'condition':
+          this.prevResult = this.processCondition(action.params)
           break;
       
         default:
@@ -198,6 +240,9 @@ export default {
     program: function () {
       // ここにプログラムを書く
       this.actionGoStraight()
+      this.actionSensor()
+      this.actionCondition(1)
+      this.actionRotate()
     }
   },
 }
