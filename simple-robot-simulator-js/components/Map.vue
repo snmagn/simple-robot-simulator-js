@@ -35,6 +35,16 @@ export default {
       ],
     },
   },
+  created: function () {
+    this.mapData.forEach((line, y) => {
+      line.forEach((tile, x) => {
+        if (tile == 0) {
+          this.robot.loc.x = x
+          this.robot.loc.y = y
+        }
+      });
+    });
+  }
 }
 </script>
 
