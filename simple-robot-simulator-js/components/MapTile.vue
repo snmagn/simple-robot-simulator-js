@@ -7,9 +7,9 @@
 export default {
   props: {
     type: {
-      type: String,
+      type: Number,
       required: false,
-      default: "Wall",
+      default: 1,
     }
   },
   computed: {
@@ -17,8 +17,8 @@ export default {
     bgColor: function () {
       // `this` は vm インスタンスを指します
       var bgColors = {
-        Wall: "rgb(44, 44, 44)",
-        Floor: "#eee",
+        1: "rgb(44, 44, 44)",
+        2: "#eee",
       }
       return {
         '--back-ground': bgColors[this.type],
@@ -30,9 +30,9 @@ export default {
 
 <style>
 .square{
-  position: relative;
-  width: 100%;
-  padding-top: 100%;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
   background: var(--back-ground)
 }
 </style>
