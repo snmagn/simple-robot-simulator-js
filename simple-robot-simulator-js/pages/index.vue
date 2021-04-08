@@ -5,6 +5,7 @@
       <b-button v-on:click="run" variant="success">Run</b-button>
       <b-button v-on:click="step" variant="success">Step</b-button>
       <b-button v-on:click="stop" variant="danger">Stop</b-button>
+      <div>{{ msg }}</div>
     </div>
   </div>
 </template>
@@ -14,6 +15,11 @@ import Map from '../components/Map.vue'
 export default {
   components: { Map },
   props: {
+    msg: {
+      type: String,
+      required: false,
+      default: () => "",
+    },
     robot: {
       type: Object,
       required: false,
@@ -90,6 +96,84 @@ export default {
     actionRotate: function (degree) {
       this.actionAdd('rot', degree)
     },
+    processSensor: function () {
+      var result = 0
+
+      if (this.robot.rot < 90) {
+        var sensor = this.robot.loc.y -1
+        if (sensor > 0) {
+          if (this.mapData[sensor][this.robot.loc.x]) {
+            result = 1
+          }
+        } else {
+          result = 1
+        }
+      } else if (this.robot.rot < 180) {
+        var sensor = this.robot.loc.x +1
+        if (sensor < this.mapData[0].length) {
+          if (this.mapData[this.robot.loc.y][sensor]) {
+            result = 1
+          }
+        } else {
+          result = 1
+        }
+      } else if (this.robot.rot < 270) {
+        var sensor = this.robot.loc.y +1
+        if (sensor < this.mapData.length) {
+          if (this.mapData[sensor][this.robot.loc.x]) {
+            result = 1
+          }
+        } else {
+          result = 1
+        }
+      } else if (this.robot.rot < 360) {
+        var sensor = this.robot.loc.x -1
+        if (sensor > 0) {
+          if (this.mapData[this.robot.loc.y][sensor]) {
+            result = 1
+          }
+        } else {
+          result = 1
+        }
+      }
+      
+      return result
+    },
+    proocessGo: function () {
+      var result = 0
+      var dv = this.calcDirection()
+      var nextX = this.robot.loc.x + dv.x
+      var nextY = this.robot.loc.y + dv.y
+      if (nextX <= 0) {
+        nextX = 0
+      } else if (nextX >= this.mapData[0].length) {
+        nextX = this.mapData[0].length - 1
+      }
+      if (nextY <= 0) {
+        nextY = 0
+      } else if (nextY >= this.mapData.length) {
+        nextY = this.mapData.length - 1
+      }
+
+      // 壁にめり込んでいるか
+      if (this.mapData[nextY][nextX] == 1) {
+        // 壁にめり込んでいる場合は位置更新を行わない
+        result = 1
+      } else {
+        // 壁にめり込んでいない場合は位置更新を行う
+        this.robot.loc.x = nextX
+        this.robot.loc.y = nextY
+      }
+
+      // ゴールしているか？
+      if (this.mapData[this.robot.loc.y][this.robot.loc.x] == 9) {
+        // 実行を停止し、完了メッセージを表示する。
+        this.stop()
+        this.msg = "ゴール！！！"
+      }
+
+      return result
+    },
     processRun: function () {
       var action = this.programChain[this.programCounter++]
       if (this.programCounter >= this.programChain.length) {
@@ -97,60 +181,10 @@ export default {
       }
       switch (action.action) {
         case 'sensor':
-          this.prevResult = 0
-          if (this.robot.rot < 90) {
-            var sensor = this.robot.loc.y -1
-            if (sensor > 0) {
-              if (this.mapData[sensor][this.robot.loc.x]) {
-                this.prevResult = 1
-              }
-            } else {
-              this.prevResult = 1
-            }
-          } else if (this.robot.rot < 180) {
-            var sensor = this.robot.loc.x +1
-            if (sensor < this.mapData[0].length) {
-              if (this.mapData[this.robot.loc.y][sensor]) {
-                this.prevResult = 1
-              }
-            } else {
-              this.prevResult = 1
-            }
-          } else if (this.robot.rot < 270) {
-            var sensor = this.robot.loc.y +1
-            if (sensor < this.mapData.length) {
-              if (this.mapData[sensor][this.robot.loc.x]) {
-                this.prevResult = 1
-              }
-            } else {
-              this.prevResult = 1
-            }
-          } else if (this.robot.rot < 360) {
-            var sensor = this.robot.loc.x -1
-            if (sensor > 0) {
-              if (this.mapData[this.robot.loc.y][sensor]) {
-                this.prevResult = 1
-              }
-            } else {
-              this.prevResult = 1
-            }
-          }
+          this.prevResult = this.processSensor()
           break;
         case 'go':
-          var dv = this.calcDirection()
-          this.robot.loc.x += dv.x
-          this.robot.loc.y += dv.y
-          if (this.robot.loc.x <= 0) {
-            this.robot.loc.x = 0
-          } else if (this.robot.loc.x >= this.mapData[0].length) {
-            this.robot.loc.x = this.mapData[0].length - 1
-          }
-          if (this.robot.loc.y <= 0) {
-            this.robot.loc.y = 0
-          } else if (this.robot.loc.y >= this.mapData.length) {
-            this.robot.loc.y = this.mapData.length - 1
-          }
-          this.prevResult = 1
+          this.prevResult = this.proocessGo()
           break;
         case 'rot':
           this.robot.rot += action.params[0]
