@@ -1,34 +1,17 @@
 <template>
   <div class="container">
     <div>
-      <Logo />
-      <h1 class="title">
-        simple-robot-simulator-js
-      </h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+      <Map></Map>
+      <Button></Button>
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import Button from '../components/Button.vue'
+import Map from '../components/Map.vue'
+export default {
+  components: { Map, Button },}
 </script>
 
 <style>
