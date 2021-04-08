@@ -56,7 +56,7 @@ export default {
     run: function () {
       this.intervalTimerHandler = setInterval(() => {
         this.processRun()
-      }, 1000);
+      }, 100);
     },
     step: function () {
       this.stop()
@@ -103,6 +103,7 @@ export default {
       this.actionAdd('condition', condition, varName)
     },
     processSensor: function () {
+      console.log("process Sensor")
       var result = 0
 
       var nextLoc = this.calcNextLoc()
@@ -162,6 +163,7 @@ export default {
       return result
     },
     processRotate: function (degree) {
+      console.log("process Rotate")
       var result = 0
       this.robot.rot += degree
       if (this.robot.rot <= 0 || this.robot.rot >= 360) {
@@ -170,6 +172,7 @@ export default {
       return result
     },
     processMemory: function (varName) {
+      console.log("process Memory")
       var result = 0
       this.vars[varName] = this.prevResult
       console.log("memory[" + varName + "]:" + this.vars[varName])
