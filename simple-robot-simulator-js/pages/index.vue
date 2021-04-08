@@ -233,9 +233,6 @@ export default {
     },
     program: function () {
       // ここにプログラムを書く
-      // this.actionSensor()
-      // this.actionCondition(0)
-      // this.actionGoStraight()
       this.actionSensor()
       this.actionMemory('sensor')
       this.actionCondition(0, 'sensor')
@@ -243,10 +240,7 @@ export default {
       this.actionCondition(1, 'sensor')
       this.actionRotate(270)
 
-      // this.actionSensor()
-      // this.actionCondition(0)
       // this.actionGoStraight()
-      // this.actionSensor()
       // this.actionCondition(1)
       // this.actionRotate(270)
     }
