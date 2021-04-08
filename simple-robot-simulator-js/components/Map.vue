@@ -1,12 +1,10 @@
 <template>
-  <div>
-    <div v-for="(line, index) in mapData" :key="index">
-      <div class="one-line" v-for="(tile, mIndex) in mapData[index]" :key="mIndex">
-        <MapTile v-bind:type="tile"></MapTile>
-      </div>
-    </div>
+  <table>
+    <tr v-for="(line, index) in mapData" :key="index">
+      <MapTile v-for="(type, mIndex) in mapData[index]" :key="mIndex" v-bind:type="type" v-bind:loc="{x:mIndex, y:index}" v-bind:rot="robot.rot" v-bind:robotLoc="robot.loc"></MapTile>
+    </tr>
     <!-- <MapTile></MapTile> -->
-  </div>
+  </table>
 </template>
 
 <script>
@@ -14,6 +12,17 @@ import MapTile from './MapTile.vue'
 export default {
   components: { MapTile },
   props: {
+    robot: {
+      type: Object,
+      required: false,
+      default: () => ({
+        loc: {
+          x:0,
+          y:0,
+        },
+        rot: 0,
+      })
+    },
     mapData: {
       type: Array,
       required: false,

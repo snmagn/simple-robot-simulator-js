@@ -1,7 +1,7 @@
 <template>
-  <div class="square" v-bind:style="bgColor">
+  <td class="square" v-bind:style="bgColor">
     <img class="robot" v-show="isHere" v-bind:style="robotRot" src="~/assets/robot.png"/>
-  </div>
+  </td>
 </template>
 
 <script>
@@ -12,11 +12,15 @@ export default {
       required: false,
       default: 1,
     },
-    /// ロボットがこのタイルにいる。
-    isHere: {
-      type: Boolean,
+    loc: {
+      type: Object,
       required: false,
-      default: false,
+      default: () => ({x:0, y:0}),
+    },
+    robotLoc: {
+      type: Object,
+      required: false,
+      default: () => ({x:0, y:0}),
     },
     /// 0:上向き,時計回り（〜359）,現在は90刻みでしか動作しない。
     rot: {
@@ -47,6 +51,9 @@ export default {
       return {
         '--robot-rot': this.rot + "deg",
       }
+    },
+    isHere: function () {
+      return ((this.loc.x == this.robotLoc.x) && (this.loc.y == this.robotLoc.y))
     }
   }
 }
