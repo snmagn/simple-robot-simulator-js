@@ -1,17 +1,46 @@
 <template>
   <div class="container">
     <div>
-      <Map></Map>
-      <Button></Button>
+      <Map v-bind:robot="robot"></Map>
+      <b-button v-on:click="run" variant="success">Run</b-button>
     </div>
   </div>
 </template>
 
 <script>
-import Button from '../components/Button.vue'
 import Map from '../components/Map.vue'
 export default {
-  components: { Map, Button },}
+  components: { Map },
+  props: {
+    robot: {
+      type: Object,
+      required: false,
+      default: () => ({
+        loc: {
+          x:0,
+          y:0,
+        },
+        rot: 0,
+      })
+    },
+    mapData: {
+      type: Array,
+      required: false,
+      default: () => [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 9, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 1, 1, 1, 1, 1, 2, 1],
+        [1, 1, 1, 1, 1, 1, 1, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+  },
+  methods: {
+    run: function () {
+      console.log("Hello!")
+    }
+  }
+}
 </script>
 
 <style>
