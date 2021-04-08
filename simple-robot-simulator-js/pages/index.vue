@@ -16,11 +16,6 @@ import Map from '../components/Map.vue'
 export default {
   components: { Map },
   props: {
-    msg: {
-      type: String,
-      required: false,
-      default: () => "",
-    },
     robot: {
       type: Object,
       required: false,
@@ -45,6 +40,7 @@ export default {
     },
   },
   data: () => ({
+    msg: "",
     steps: 0,
     intervalTimerHandler: null,
     programChain: [],
@@ -176,9 +172,11 @@ export default {
     processMemory: function (varName) {
       var result = 0
       this.vars[varName] = this.prevResult
+      console.log("memory[" + varName + "]:" + this.vars[varName])
       return result
     },
     processCondition: function (condition, varName) {
+      var result = 0
       console.log("condtion condition:" + condition)
       if (varName == null) {
         if (this.prevResult != condition) {
@@ -191,6 +189,7 @@ export default {
         }
       }
       console.log("condition skip:" + this.skipNext)
+      return result
     },
     processRun: function () {
       this.steps++
@@ -216,6 +215,7 @@ export default {
           this.prevResult = this.processMemory(action.params[0])
           break;
         case 'condition':
+          console.log("debug:" + action.params)
           if (action.params.length = 1) {
             this.prevResult = this.processCondition(action.params[0], null)
           } else {
@@ -229,9 +229,9 @@ export default {
     },
     program: function () {
       // ここにプログラムを書く
-      this.actionSensor()
-      this.actionCondition(0)
-      this.actionGoStraight()
+      // this.actionSensor()
+      // this.actionCondition(0)
+      // this.actionGoStraight()
       // this.actionSensor()
       // this.actionMemory('sensor')
       // this.actionCondition(0, 'sensor')
@@ -239,6 +239,13 @@ export default {
       // this.actionSensor()
       // this.actionCondition(1)
       // this.actionRotate()
+
+      this.actionSensor()
+      this.actionCondition(0)
+      this.actionGoStraight()
+      this.actionSensor()
+      this.actionCondition(1)
+      this.actionRotate(270)
     }
   },
 }
