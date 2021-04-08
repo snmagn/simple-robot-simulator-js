@@ -103,8 +103,8 @@ export default {
     actionMemory: function (varName) {
       this.actionAdd('memory', varName)
     },
-    actionCondition: function (...condition) {
-      this.actionAdd('condition', condition)
+    actionCondition: function (condition, varName) {
+      this.actionAdd('condition', condition, varName)
     },
     processSensor: function () {
       var result = 0
@@ -140,6 +140,7 @@ export default {
       }
     },
     processGo: function () {
+      console.log('process Go')
       var result = 0
       var nextLoc = this.calcNextLoc()
       var nextX = nextLoc.x
@@ -177,14 +178,19 @@ export default {
       this.vars[varName] = this.prevResult
       return result
     },
-    processCondition: function (...condition) {
-      if (condition.length == 1) {
-        if (this.prevResult != condition[0]) {
+    processCondition: function (condition, varName) {
+      console.log("condtion condition:" + condition)
+      if (varName == null) {
+        if (this.prevResult != condition) {
           this.skipNext = true
         }
-      } else if(this.vars[condition[1]] != condition[0]) {
+      } else {
+        console.log("condtion var:" + this.vars[varName])
+        if(this.vars[varName] != condition) {
           this.skipNext = true
+        }
       }
+      console.log("condition skip:" + this.skipNext)
     },
     processRun: function () {
       this.steps++
@@ -210,7 +216,11 @@ export default {
           this.prevResult = this.processMemory(action.params[0])
           break;
         case 'condition':
-          this.prevResult = this.processCondition(action.params)
+          if (action.params.length = 1) {
+            this.prevResult = this.processCondition(action.params[0], null)
+          } else {
+            this.prevResult = this.processCondition(action.params[0], action.params[1])
+          }
           break;
       
         default:
@@ -222,6 +232,10 @@ export default {
       this.actionSensor()
       this.actionCondition(0)
       this.actionGoStraight()
+      // this.actionSensor()
+      // this.actionMemory('sensor')
+      // this.actionCondition(0, 'sensor')
+      // this.actionGoStraight()
       // this.actionSensor()
       // this.actionCondition(1)
       // this.actionRotate()
