@@ -56,7 +56,7 @@ export default {
     run: function () {
       this.intervalTimerHandler = setInterval(() => {
         this.processRun()
-      }, 100);
+      }, 50);
     },
     step: function () {
       this.stop()
@@ -180,8 +180,10 @@ export default {
     },
     processCondition: function (condition, varName) {
       var result = 0
-      console.log("condtion condition:" + condition)
+      console.log("process Condition")
+      console.log("condition:" + condition + ", varName:" + varName)
       if (varName == null) {
+        console.log("condtion prevResult:" + this.prevResult)
         if (this.prevResult != condition) {
           this.skipNext = true
         }
@@ -218,8 +220,7 @@ export default {
           this.prevResult = this.processMemory(action.params[0])
           break;
         case 'condition':
-          console.log("debug:" + action.params)
-          if (action.params.length = 1) {
+          if (action.params.length == 1) {
             this.prevResult = this.processCondition(action.params[0], null)
           } else {
             this.prevResult = this.processCondition(action.params[0], action.params[1])
@@ -235,20 +236,19 @@ export default {
       // this.actionSensor()
       // this.actionCondition(0)
       // this.actionGoStraight()
+      this.actionSensor()
+      this.actionMemory('sensor')
+      this.actionCondition(0, 'sensor')
+      this.actionGoStraight()
+      this.actionCondition(1, 'sensor')
+      this.actionRotate(270)
+
       // this.actionSensor()
-      // this.actionMemory('sensor')
-      // this.actionCondition(0, 'sensor')
+      // this.actionCondition(0)
       // this.actionGoStraight()
       // this.actionSensor()
       // this.actionCondition(1)
-      // this.actionRotate()
-
-      this.actionSensor()
-      this.actionCondition(0)
-      this.actionGoStraight()
-      this.actionSensor()
-      this.actionCondition(1)
-      this.actionRotate(270)
+      // this.actionRotate(270)
     }
   },
 }
