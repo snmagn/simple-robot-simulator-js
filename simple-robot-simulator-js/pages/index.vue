@@ -3,6 +3,8 @@
     <div>
       <Map v-bind:robot="robot"></Map>
       <b-button v-on:click="run" variant="success">Run</b-button>
+      <b-button v-on:click="step" variant="success">Step</b-button>
+      <b-button v-on:click="stop" variant="danger">Stop</b-button>
     </div>
   </div>
 </template>
@@ -35,9 +37,23 @@ export default {
       ],
     },
   },
+  data: {
+    intervalTimerHandler: null,
+  },
   methods: {
     run: function () {
-      console.log("Hello!")
+      this.intervalTimerHandler = setInterval(() => {
+        this.robot.loc.y -= 1
+      }, 1000);
+    },
+    step: function () {
+      this.intervalTimerHandler = setInterval(() => {
+        this.robot.loc.y -= 1
+        clearInterval(this.intervalTimerHandler)
+      }, 0);
+    },
+    stop: function () {
+      clearInterval(this.intervalTimerHandler)
     }
   }
 }
