@@ -109,48 +109,17 @@ export default {
     processSensor: function () {
       var result = 0
 
-      if (this.robot.rot < 90) {
-        var sensor = this.robot.loc.y -1
-        if (sensor > 0) {
-          if (this.mapData[sensor][this.robot.loc.x]) {
-            result = 1
-          }
-        } else {
-          result = 1
-        }
-      } else if (this.robot.rot < 180) {
-        var sensor = this.robot.loc.x +1
-        if (sensor < this.mapData[0].length) {
-          if (this.mapData[this.robot.loc.y][sensor]) {
-            result = 1
-          }
-        } else {
-          result = 1
-        }
-      } else if (this.robot.rot < 270) {
-        var sensor = this.robot.loc.y +1
-        if (sensor < this.mapData.length) {
-          if (this.mapData[sensor][this.robot.loc.x]) {
-            result = 1
-          }
-        } else {
-          result = 1
-        }
-      } else if (this.robot.rot < 360) {
-        var sensor = this.robot.loc.x -1
-        if (sensor > 0) {
-          if (this.mapData[this.robot.loc.y][sensor]) {
-            result = 1
-          }
-        } else {
-          result = 1
-        }
+      var nextLoc = this.calcNextLoc()
+
+      if (this.mapData[nextLoc.y][nextLoc.x] == 1) {
+        result = 1
       }
+      console.log("sensor x:" + nextLoc.x + ", y:" + nextLoc.y)
+      console.log("sensor:" + result)
       
       return result
     },
-    processGo: function () {
-      var result = 0
+    calcNextLoc: function () {
       var dv = this.calcDirection()
       var nextX = this.robot.loc.x + dv.x
       var nextY = this.robot.loc.y + dv.y
@@ -164,6 +133,17 @@ export default {
       } else if (nextY >= this.mapData.length) {
         nextY = this.mapData.length - 1
       }
+
+      return {
+        x: nextX,
+        y: nextY,
+      }
+    },
+    processGo: function () {
+      var result = 0
+      var nextLoc = this.calcNextLoc()
+      var nextX = nextLoc.x
+      var nextY = nextLoc.y
 
       // 壁にめり込んでいるか
       if (this.mapData[nextY][nextX] == 1) {
@@ -239,10 +219,12 @@ export default {
     },
     program: function () {
       // ここにプログラムを書く
-      this.actionGoStraight()
       this.actionSensor()
-      this.actionCondition(1)
-      this.actionRotate()
+      this.actionCondition(0)
+      this.actionGoStraight()
+      // this.actionSensor()
+      // this.actionCondition(1)
+      // this.actionRotate()
     }
   },
 }
