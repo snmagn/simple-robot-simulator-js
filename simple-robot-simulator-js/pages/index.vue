@@ -277,14 +277,10 @@ export default {
       // ここにプログラムを書く
       this.actionGoStraight()
       this.actionSensor()
-      this.actionMemory('sensor1')
-      
-      this.actionCondition(true, 'sensor1')
+      this.actionCondition(true)
       this.actionRotate(90)
       this.actionSensor()
-      this.actionMemory('sensor2')
-
-      this.actionCondition(true, 'sensor2')
+      this.actionCondition(true)
       this.actionRotate(180)
     }
   },
