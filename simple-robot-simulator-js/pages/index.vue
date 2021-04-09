@@ -275,28 +275,6 @@ export default {
     },
     program: function () {
       // ここにプログラムを書く
-      // this.actionSensor()
-      // this.actionMemory('sensor')
-      // this.actionCondition(0, 'sensor')
-      // this.actionGoStraight()
-      // this.actionCondition(1, 'sensor')
-      // this.actionRotate(270)
-
-      // this.actionGoStraight()
-      // this.actionCondition(1)
-      // this.actionRotate(270)
-
-      // this.actionSensor()
-      // this.actionMemory('sensor')
-      // this.actionCondition(0, 'sensor')
-      // this.actionGoStraight()
-      // this.actionCondition(1, 'sensor')
-      // this.actionRotate(270)
-      // this.actionSensor()
-      // this.actionMemory('sensor')
-      // this.actionCondition(1, 'sensor')
-      // this.actionRotate(270)
-
       this.actionSensor()
       this.actionMemory('sensor1')
       
@@ -314,15 +292,6 @@ export default {
 
       this.actionRotate(90)
 
-      // this.actionCondition(0, 'sensor1')
-      // this.actionGoStraight()
-      // this.actionCondition(1, 'sensor1')
-      // this.actionCondition(0, 'sensor2')
-      // this.actionGoStraight()
-      // this.actionCondition(1, 'sensor2')
-      // this.actionCondition(0, 'sensor3')
-      // this.actionGoStraight()
-
       this.actionCondition(true, () => {
         return this.conditionEqual(true, 'sensor1') && this.conditionEqual(false, 'sensor2')
       })
@@ -331,7 +300,7 @@ export default {
         return this.conditionEqual(true, 'sensor1') && this.conditionEqual(false, 'sensor4')
       })
       this.actionRotate(270)
-      this.actionCondition(0, 'sensor1')
+      this.actionCondition(false, 'sensor1')
       this.actionGoStraight()
     }
   },
