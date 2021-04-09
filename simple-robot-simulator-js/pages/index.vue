@@ -32,8 +32,8 @@ export default {
       required: false,
       default: () => [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 9, 2, 2, 2, 2, 2, 2, 1],
-        [1, 1, 1, 1, 1, 1, 1, 2, 1],
+        [1, 9, 2, 2, 2, 2, 2, 1, 1],
+        [1, 1, 1, 1, 1, 1, 2, 2, 1],
         [1, 1, 1, 1, 1, 1, 1, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
       ],
@@ -53,6 +53,9 @@ export default {
     this.program()
   },
   methods: {
+    typeOf: function (obj) {
+      return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+    },
     run: function () {
       this.intervalTimerHandler = setInterval(() => {
         this.processRun()
@@ -99,17 +102,17 @@ export default {
     actionMemory: function (varName) {
       this.actionAdd('memory', varName)
     },
-    actionCondition: function (condition, varName) {
-      this.actionAdd('condition', condition, varName)
+    actionCondition: function (condition, varName, registerable = false) {
+      this.actionAdd('condition', condition, varName, registerable)
     },
     processSensor: function () {
       console.log("process Sensor")
-      var result = 0
+      var result = false
 
       var nextLoc = this.calcNextLoc()
 
       if (this.mapData[nextLoc.y][nextLoc.x] == 1) {
-        result = 1
+        result = true
       }
       console.log("sensor x:" + nextLoc.x + ", y:" + nextLoc.y)
       console.log("sensor:" + result)
@@ -131,6 +134,8 @@ export default {
         nextY = this.mapData.length - 1
       }
 
+      console.log("nextLoc: x="+nextX+", y="+nextY)
+
       return {
         x: nextX,
         y: nextY,
@@ -138,7 +143,7 @@ export default {
     },
     processGo: function () {
       console.log('process Go')
-      var result = 0
+      var result = false
       var nextLoc = this.calcNextLoc()
       var nextX = nextLoc.x
       var nextY = nextLoc.y
@@ -146,7 +151,7 @@ export default {
       // 壁にめり込んでいるか
       if (this.mapData[nextY][nextX] == 1) {
         // 壁にめり込んでいる場合は位置更新を行わない
-        result = 1
+        result = true
       } else {
         // 壁にめり込んでいない場合は位置更新を行う
         this.robot.loc.x = nextX
@@ -164,34 +169,71 @@ export default {
     },
     processRotate: function (degree) {
       console.log("process Rotate")
-      var result = 0
+      var result = false
       this.robot.rot += degree
-      if (this.robot.rot <= 0 || this.robot.rot >= 360) {
+      if (this.robot.rot <= 0) {
         this.robot.rot = 0
+      } else if (this.robot.rot >= 360) {
+        this.robot.rot -= 360
       }
       return result
     },
     processMemory: function (varName) {
       console.log("process Memory")
-      var result = 0
+      var result = false
       this.vars[varName] = this.prevResult
       console.log("memory[" + varName + "]:" + this.vars[varName])
       return result
     },
+    conditionEqual: function (condition, varName) {
+      var result = true
+      console.log("condition Equal")
+      console.log("condition:" + condition + ", varName:" + varName)
+      if (varName == null) {
+        console.log("condtion prevResult:" + this.prevResult)
+        if (this.prevResult != condition) {
+          result = false
+        }
+      } else if(this.typeOf(varName) == "string") {
+        console.log("condtion var:" + this.vars[varName])
+        if(this.vars[varName] != condition) {
+          result = false
+        }
+      } else if(this.typeOf(varName) == "function") {
+        if((varName() != condition)) {
+          result = false
+        }
+        console.log("condtion function:" + result)
+      } else {
+        console.error("invalid condition", varName)
+      }
+      console.log("condition Equal[result]:" + result)
+      return result
+    },
     processCondition: function (condition, varName) {
-      var result = 0
+      var result = true
       console.log("process Condition")
       console.log("condition:" + condition + ", varName:" + varName)
       if (varName == null) {
         console.log("condtion prevResult:" + this.prevResult)
         if (this.prevResult != condition) {
           this.skipNext = true
+          result = false
         }
-      } else {
+      } else if(this.typeOf(varName) == "string") {
         console.log("condtion var:" + this.vars[varName])
         if(this.vars[varName] != condition) {
           this.skipNext = true
+          result = false
         }
+      } else if(this.typeOf(varName) == "function") {
+        if((varName() != condition)) {
+          this.skipNext = true
+          result = false
+        }
+        console.log("condtion function:" + result)
+      } else {
+        console.error("invalid condition", varName)
       }
       console.log("condition skip:" + this.skipNext)
       return result
@@ -233,16 +275,64 @@ export default {
     },
     program: function () {
       // ここにプログラムを書く
-      this.actionSensor()
-      this.actionMemory('sensor')
-      this.actionCondition(0, 'sensor')
-      this.actionGoStraight()
-      this.actionCondition(1, 'sensor')
-      this.actionRotate(270)
+      // this.actionSensor()
+      // this.actionMemory('sensor')
+      // this.actionCondition(0, 'sensor')
+      // this.actionGoStraight()
+      // this.actionCondition(1, 'sensor')
+      // this.actionRotate(270)
 
       // this.actionGoStraight()
       // this.actionCondition(1)
       // this.actionRotate(270)
+
+      // this.actionSensor()
+      // this.actionMemory('sensor')
+      // this.actionCondition(0, 'sensor')
+      // this.actionGoStraight()
+      // this.actionCondition(1, 'sensor')
+      // this.actionRotate(270)
+      // this.actionSensor()
+      // this.actionMemory('sensor')
+      // this.actionCondition(1, 'sensor')
+      // this.actionRotate(270)
+
+      this.actionSensor()
+      this.actionMemory('sensor1')
+      
+      this.actionRotate(90)
+      this.actionSensor()
+      this.actionMemory('sensor2')
+
+      this.actionRotate(90)
+      this.actionSensor()
+      this.actionMemory('sensor3')
+
+      this.actionRotate(90)
+      this.actionSensor()
+      this.actionMemory('sensor4')
+
+      this.actionRotate(90)
+
+      // this.actionCondition(0, 'sensor1')
+      // this.actionGoStraight()
+      // this.actionCondition(1, 'sensor1')
+      // this.actionCondition(0, 'sensor2')
+      // this.actionGoStraight()
+      // this.actionCondition(1, 'sensor2')
+      // this.actionCondition(0, 'sensor3')
+      // this.actionGoStraight()
+
+      this.actionCondition(true, () => {
+        return this.conditionEqual(true, 'sensor1') && this.conditionEqual(false, 'sensor2')
+      })
+      this.actionRotate(90)
+      this.actionCondition(true, () => {
+        return this.conditionEqual(true, 'sensor1') && this.conditionEqual(false, 'sensor4')
+      })
+      this.actionRotate(270)
+      this.actionCondition(0, 'sensor1')
+      this.actionGoStraight()
     }
   },
 }
