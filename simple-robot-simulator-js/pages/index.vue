@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div>
-      <Map v-bind:robot="robot"></Map>
+      <Map v-bind:robot="robot" v-bind:mapData="mapData"></Map>
       <b-button v-on:click="run" variant="success">Run</b-button>
       <b-button v-on:click="step" variant="success">Step</b-button>
       <b-button v-on:click="stop" variant="danger">Stop</b-button>

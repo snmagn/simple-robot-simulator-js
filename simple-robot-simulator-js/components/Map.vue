@@ -25,14 +25,7 @@ export default {
     },
     mapData: {
       type: Array,
-      required: false,
-      default: () => [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 9, 2, 2, 2, 2, 2, 1, 1],
-        [1, 1, 1, 1, 1, 1, 2, 2, 1],
-        [1, 1, 1, 1, 1, 1, 1, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-      ],
+      required: true,
     },
   },
   created: function () {
