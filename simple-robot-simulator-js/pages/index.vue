@@ -275,18 +275,14 @@ export default {
     },
     program: function () {
       // ここにプログラムを書く
-      this.actionSensor()
+      this.actionGoStraight()
       this.actionMemory('sensor1')
       
       this.actionRotate(90)
       this.actionSensor()
       this.actionMemory('sensor2')
 
-      this.actionRotate(90)
-      this.actionSensor()
-      this.actionMemory('sensor3')
-
-      this.actionRotate(90)
+      this.actionRotate(180)
       this.actionSensor()
       this.actionMemory('sensor4')
 
@@ -300,8 +296,6 @@ export default {
         return this.conditionEqual(true, 'sensor1') && this.conditionEqual(false, 'sensor4')
       })
       this.actionRotate(270)
-      this.actionCondition(false, 'sensor1')
-      this.actionGoStraight()
     }
   },
 }
