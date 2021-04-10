@@ -29,14 +29,21 @@ export default {
     },
   },
   created: function () {
-    this.mapData.forEach((line, y) => {
-      line.forEach((tile, x) => {
-        if (tile == 0) {
-          this.robot.loc.x = x
-          this.robot.loc.y = y
-        }
-      });
-    });
+    this.reset()
+  },
+  methods: {
+    reset: function () {
+      console.debug("Map reset")
+      this.mapData.forEach((line, y) => {
+        line.forEach((tile, x) => {
+          if (tile == 0) {
+            this.robot.loc.x = x
+            this.robot.loc.y = y
+            this.robot.rot = 0
+          }
+        })
+      })
+    }
   }
 }
 </script>

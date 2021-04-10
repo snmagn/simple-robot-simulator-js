@@ -1,12 +1,18 @@
 <template>
   <div class="container">
     <div>
-      <Map v-bind:robot="robot" v-bind:mapData="mapData"></Map>
+      <Map ref="map" v-bind:robot="robot" v-bind:mapData="mapDataList[selected]"></Map>
       <b-button v-on:click="run" variant="success">Run</b-button>
       <b-button v-on:click="step" variant="success">Step</b-button>
       <b-button v-on:click="stop" variant="danger">Stop</b-button>
+      <b-button v-on:click="reset" variant="danger">Reset</b-button>
       <div>{{ steps }} steps</div>
       <div>{{ msg }}</div>
+    </div>
+    <div>
+      <select v-model="selected">
+        <option v-for="(mapData, name) in mapDataList" :key="name">{{ name }}</option>
+      </select>
     </div>
   </div>
 </template>
@@ -27,23 +33,53 @@ export default {
         rot: 0,
       })
     },
-    mapData: {
-      type: Array,
+    mapDataList: {
+      type: Object,
       required: false,
-      default: () => [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 9, 2, 2, 2, 2, 2, 1, 1],
-        [1, 1, 1, 1, 1, 1, 2, 2, 1],
-        [1, 1, 1, 1, 1, 1, 1, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-      ],
+      default: () => ({
+        level1: [
+          [1, 1, 1, 1, 1, 1, 1, 1, 1],
+          [1, 9, 2, 2, 2, 2, 2, 2, 1],
+          [1, 1, 1, 1, 1, 1, 1, 2, 1],
+          [1, 1, 1, 1, 1, 1, 1, 0, 1],
+          [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ],
+        level2: [
+          [1, 1, 1, 1, 1, 1, 1, 1, 1],
+          [1, 9, 2, 2, 2, 2, 2, 1, 1],
+          [1, 1, 1, 1, 1, 1, 2, 2, 1],
+          [1, 1, 1, 1, 1, 1, 1, 0, 1],
+          [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ],
+        level3: [
+          [1, 1, 1, 1, 1, 1, 1, 1, 1],
+          [1, 9, 1, 2, 2, 2, 2, 2, 1],
+          [1, 2, 1, 2, 1, 2, 1, 2, 1],
+          [1, 2, 1, 2, 1, 2, 1, 2, 1],
+          [1, 2, 2, 2, 2, 2, 1, 0, 1],
+          [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ],
+        level4: [
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+          [1, 9, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1],
+          [1, 2, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 1],
+          [1, 2, 2, 2, 1, 2, 1, 2, 1, 1, 1, 2, 1],
+          [1, 1, 1, 2, 1, 2, 1, 0, 1, 2, 2, 2, 1],
+          [1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 1, 2, 1],
+          [1, 1, 1, 1, 1, 2, 1, 9, 1, 2, 2, 1, 1],
+          [1, 1, 1, 1, 9, 2, 1, 2, 1, 1, 2, 1, 1],
+          [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1],
+          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ],
+      })
     },
   },
   data: () => ({
-    msg: "",
-    steps: 0,
     intervalTimerHandler: null,
     programChain: [],
+    selected: "level1",
+    msg: "",
+    steps: 0,
     programCounter: 0,
     prevResult: 0,
     skipNext: false,
@@ -67,6 +103,18 @@ export default {
     },
     stop: function () {
       clearInterval(this.intervalTimerHandler)
+    },
+    reset: function () {
+      this.stop()
+      this.msg = ""
+      this.steps = 0
+      this.programCounter= 0
+      this.prevResult= 0
+      this.skipNext = false
+      this.vars = []
+      // this.$refs.map.$emit('reset')
+      this.$refs.map.reset()
+      console.debug("reset")
     },
     calcDirection: function () {
       var dv = {
@@ -111,7 +159,7 @@ export default {
 
       var nextLoc = this.calcNextLoc()
 
-      if (this.mapData[nextLoc.y][nextLoc.x] == 1) {
+      if (this.mapDataList[this.selected][nextLoc.y][nextLoc.x] == 1) {
         result = true
       }
       console.log("sensor x:" + nextLoc.x + ", y:" + nextLoc.y)
@@ -125,13 +173,13 @@ export default {
       var nextY = this.robot.loc.y + dv.y
       if (nextX <= 0) {
         nextX = 0
-      } else if (nextX >= this.mapData[0].length) {
-        nextX = this.mapData[0].length - 1
+      } else if (nextX >= this.mapDataList[this.selected][0].length) {
+        nextX = this.mapDataList[this.selected][0].length - 1
       }
       if (nextY <= 0) {
         nextY = 0
-      } else if (nextY >= this.mapData.length) {
-        nextY = this.mapData.length - 1
+      } else if (nextY >= this.mapDataList[this.selected].length) {
+        nextY = this.mapDataList[this.selected].length - 1
       }
 
       console.log("nextLoc: x="+nextX+", y="+nextY)
@@ -149,7 +197,7 @@ export default {
       var nextY = nextLoc.y
 
       // 壁にめり込んでいるか
-      if (this.mapData[nextY][nextX] == 1) {
+      if (this.mapDataList[this.selected][nextY][nextX] == 1) {
         // 壁にめり込んでいる場合は位置更新を行わない
         result = true
       } else {
@@ -159,7 +207,7 @@ export default {
       }
 
       // ゴールしているか？
-      if (this.mapData[this.robot.loc.y][this.robot.loc.x] == 9) {
+      if (this.mapDataList[this.selected][this.robot.loc.y][this.robot.loc.x] == 9) {
         // 実行を停止し、完了メッセージを表示する。
         this.stop()
         this.msg = "ゴール！！！"
