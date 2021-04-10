@@ -348,11 +348,24 @@ export default {
       // ここにプログラムを書く
       this.actionGoStraight()
       this.actionSensor()
-      this.actionCondition(true)
+      this.actionMemory('sensor1')
+      
+      this.actionCondition(true, () => this.conditionEqual(true, 'sensor4') || this.conditionEqual(true, 'sensor1'))
       this.actionRotate(90)
       this.actionSensor()
-      this.actionCondition(true)
+      this.actionMemory('sensor2')
+
+      this.actionCondition(true, () => this.conditionEqual(true, 'sensor4') || this.conditionEqual(true, 'sensor2'))
       this.actionRotate(180)
+      this.actionSensor()
+      this.actionMemory('sensor3')
+
+      this.actionCondition(true, 'sensor3')
+      this.actionRotate(270)
+      this.actionCondition(true, 'sensor3')
+      this.actionMemory('sensor4', true)
+      this.actionCondition(false, 'sensor3')
+      this.actionMemory('sensor4', false)
     }
   },
 }
