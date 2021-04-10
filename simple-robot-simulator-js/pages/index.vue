@@ -13,14 +13,21 @@
       <select v-model="selected">
         <option v-for="(mapData, name) in mapDataList" :key="name">{{ name }}</option>
       </select>
+      <div>{{ intervalTime }} ms</div>
+      <vue-slider
+        ref="slider"
+        v-model="intervalTime"
+      ></vue-slider>
     </div>
   </div>
 </template>
 
 <script>
+import VueSlider from 'vue-slider-component'
+import 'vue-slider-component/theme/default.css'
 import Map from '../components/Map.vue'
 export default {
-  components: { Map },
+  components: { Map, VueSlider },
   props: {
     robot: {
       type: Object,
@@ -76,6 +83,7 @@ export default {
   },
   data: () => ({
     intervalTimerHandler: null,
+    intervalTime: 50,
     programChain: [],
     selected: "level1",
     msg: "",
@@ -95,7 +103,7 @@ export default {
     run: function () {
       this.intervalTimerHandler = setInterval(() => {
         this.processRun()
-      }, 50);
+      }, this.intervalTime);
     },
     step: function () {
       this.stop()
@@ -147,8 +155,8 @@ export default {
     actionRotate: function (degree) {
       this.actionAdd('rot', degree)
     },
-    actionMemory: function (varName) {
-      this.actionAdd('memory', varName)
+    actionMemory: function (varName, value = null) {
+      this.actionAdd('memory', varName, value)
     },
     actionCondition: function (condition, varName, registerable = false) {
       this.actionAdd('condition', condition, varName, registerable)
@@ -226,10 +234,13 @@ export default {
       }
       return result
     },
-    processMemory: function (varName) {
+    processMemory: function (varName, value = null) {
       console.log("process Memory")
       var result = false
-      this.vars[varName] = this.prevResult
+      if (value == null) {
+        value = this.prevResult
+      }
+      this.vars[varName] = value
       console.log("memory[" + varName + "]:" + this.vars[varName])
       return result
     },
@@ -244,7 +255,11 @@ export default {
         }
       } else if(this.typeOf(varName) == "string") {
         console.log("condtion var:" + this.vars[varName])
-        if(this.vars[varName] != condition) {
+        var value = this.vars[varName]
+        if (value === void 0) {
+          value = false
+        }
+        if(value != condition) {
           result = false
         }
       } else if(this.typeOf(varName) == "function") {
@@ -270,7 +285,11 @@ export default {
         }
       } else if(this.typeOf(varName) == "string") {
         console.log("condtion var:" + this.vars[varName])
-        if(this.vars[varName] != condition) {
+        var value = this.vars[varName]
+        if (value === void 0) {
+          value = false
+        }
+        if(value != condition) {
           this.skipNext = true
           result = false
         }
@@ -307,7 +326,11 @@ export default {
           this.prevResult = this.processRotate(action.params[0])
           break;
         case 'memory':
-          this.prevResult = this.processMemory(action.params[0])
+          if (action.params.length == 1) {
+            this.prevResult = this.processMemory(action.params[0])
+          } else {
+            this.prevResult = this.processMemory(action.params[0], action.params[1])
+          }
           break;
         case 'condition':
           if (action.params.length == 1) {
